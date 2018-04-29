@@ -50,7 +50,7 @@ class SideBar extends Component {
               </li>
               <li className={activeLink === 'order-food' ? 'active' : ''}>
                 <Link to='#' onClick={e => { e.preventDefault(); this.reloadMenu() }}>
-                  <i className="material-icons">contact_mail</i>
+                  <i className="material-icons">list</i>
                   <p>Quản lí thực đơn</p>
                 </Link>
                 <ul className='sub-menu'>
