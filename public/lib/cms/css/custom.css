@@ -1,0 +1,109 @@
+.react-confirm-alert-button-group{
+  justify-content: flex-end !important;
+}
+
+.react-confirm-alert-overlay{
+  align-items: flex-start !important;
+}
+
+.react-confirm-alert{
+  margin-top: 40px;
+  border-top: 2px solid orange;
+  border-top-right-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+}
+
+.react-confirm-alert-overlay{
+  background: rgba(255, 255, 255, 0.4) !important;
+}
+
+.react-confirm-alert-body{
+  border-top-right-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+}
+
+.sort-icon-active{
+  display: inline-block !important;
+}
+
+.pagination a{
+  cursor: pointer;
+  outline: none;
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale3d(.3, .3, .3);
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.zoomIn {
+  animation-name: zoomIn;
+}
+
+@keyframes zoomOut {
+  from {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+    transform: scale3d(.3, .3, .3);
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.zoomOut {
+  animation-name: zoomOut;
+}
+
+.animate{
+  animation-duration: 800ms;
+}
+
+.PreviewsContainer {
+  display: flex !important;
+  flex-wrap: wrap !important;
+}
+
+.PreviewContainer {
+  position: relative !important;
+  box-sizing: border-box !important;
+  flex: 1 0 200px !important;
+  max-height: 250px !important;
+  overflow: hidden !important;
+}
+
+.Image {
+  vertical-align: top !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.RemoveItem {
+  position: absolute !important;
+  bottom: 25px !important;
+  right: 25px !important;
+}
+
+.ActionsContainer {
+  display: flex !important;
+}
+
+#image img {
+  max-width: 20% !important;
+  width: auto !important;
+  margin: 10px;
+}
+
+#image img:parent {
+  display: inline-block !important;
+}
