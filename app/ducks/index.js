@@ -6,8 +6,6 @@ import food from 'ducks/food'
 import zone from 'ducks/zone'
 import table from 'ducks/table'
 import ordering from 'ducks/ordering'
-import selectedFood from 'ducks/selectedFood'
-import modal from 'ducks/modal'
 
 export default {
   hydration,
@@ -17,7 +15,5 @@ export default {
   zone,
   table,
   ordering,
-  notification,
-  modal,
-  selectedFood
+  notification
 }

@@ -6,9 +6,19 @@ import ReactQueryParams from 'react-query-params'
 import { isAdmin } from 'components/wrappers/isAdmin'
 
 import { priceToString } from 'lib/objects'
-import { fetchOrderings } from 'lib/actions/ordering'
+import { fetchOrderings, changeOrderFoodStatus } from 'lib/actions/ordering'
 
 class TableOrderDetail extends ReactQueryParams {
+  constructor (props) {
+    super(props)
+
+    this.changeFoodStatus = this.changeFoodStatus.bind(this)
+  }
+
+  changeFoodStatus(orderingID, foodIndex, newStatus) {
+    this.props.dispatch(changeOrderFoodStatus(orderingID, foodIndex, newStatus))
+  }
+
   componentDidMount() {
     this.props.dispatch(fetchOrderings())
   }
@@ -56,12 +66,19 @@ class TableOrderDetail extends ReactQueryParams {
               <div className='card-content'style={{ width: '100%', float: 'left', padding: '40px 20px' }}>
                 {items.map((item, index) => {
                   const image = R.values(item.imageUrl)
+                  let statusClass = 'button-confirm-food'
+
+                  if (item.status === 'Hết món') {
+                    statusClass = 'button-delete-food'
+                  } else if (item.status === 'Chế biến xong') {
+                    statusClass = 'button-done-food'
+                  }
 
                   return (
-                    <div className='col-md-4 col-sm-4 food-item' key={index}>
+                    <div className='col-md-4 col-sm-6 food-item' key={index}>
                       <article className='menus-container wow fadeIn animated' data-wow-delay='0.1s'>
                         <div className='item-entry'>
-                          <p style={style.status}> {item.status}</p>
+                          <p className={statusClass} style={style.status}> {item.status}</p>
                         </div>
                         <div>
                           <img src={ image.length > 0 ? image[0] : '' } style={{ objectFit: 'contain', width: '100%', height: '200px' }}/>
@@ -71,9 +88,24 @@ class TableOrderDetail extends ReactQueryParams {
                           <p style={style.description}> {priceToString(item.currentPrice) + ' x ' + item.quantity}</p>
                         </div>
                         <div className='item-entry' style={style.actionButton}>
-                          <Link to='#' style={style.deleteFood}>Hết món</Link>
-                          <Link to='#' style={style.confirmFood}>Xác nhận còn món</Link>
-                          <Link to='#' style={style.doneFood}>Chế biến xong</Link>
+                          <Link
+                            className='button-delete-food'
+                            to='#'
+                            style={style.deleteFood}
+                            onClick={e => { e.preventDefault(); this.changeFoodStatus(ordering.id, index, 'Hết món') }}
+                          >Hết món</Link>
+                          <Link
+                            className='button-confirm-food'
+                            to='#'
+                            style={style.deleteFood}
+                            onClick={e => { e.preventDefault(); this.changeFoodStatus(ordering.id, index, 'Đang chờ chế biến') }}
+                          >Xác nhận còn món</Link>
+                          <Link
+                            className='button-done-food'
+                            to='#'
+                            style={style.deleteFood}
+                            onClick={e => { e.preventDefault(); this.changeFoodStatus(ordering.id, index, 'Chế biến xong') }}
+                          >Chế biến xong</Link>
                         </div>
                       </article>
                     </div>
@@ -134,29 +166,6 @@ const style = {
     float: 'left',
     textAlign: 'center',
     fontSize: '17px',
-    backgroundColor: 'red',
-    color: 'white',
-    padding: '8px 15px',
-    borderRadius: '5px',
-    margin: '8px 5px',
-    fontWeight: 'bold'
-  },
-  confirmFood: {
-    float: 'left',
-    textAlign: 'center',
-    fontSize: '17px',
-    backgroundColor: 'green',
-    color: 'white',
-    padding: '8px 15px',
-    borderRadius: '5px',
-    margin: '8px 5px',
-    fontWeight: 'bold'
-  },
-  doneFood: {
-    float: 'left',
-    textAlign: 'center',
-    fontSize: '17px',
-    backgroundColor: '#26c6da',
     color: 'white',
     padding: '8px 15px',
     borderRadius: '5px',

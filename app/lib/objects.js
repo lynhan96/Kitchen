@@ -10,23 +10,6 @@ export const sortObjectsByKeyAtoZ = (datas, fieldName, offset, limit) => R.pipe(
 
 export const sortObjectsByKeyZtoA = (datas, fieldName, offset, limit) => R.reverse(sortObjectsByKeyAtoZ(datas, fieldName, offset, limit))
 
-export const makeTotalPrice = (selectItems, items) => R.pipe(
-  R.keys,
-  R.map(item => getPrice(selectItems[item], items)),
-  R.sum
-)(selectItems)
-
-export const getPrice = (selectItem, items) => {
-  const quantity = selectItem.quantity
-  const item = R.find(
-    R.propEq('id', parseInt(selectItem.id))
-  )(items)
-
-  if (!item) return 0
-
-  return item.currentPrice * quantity
-}
-
 export const priceToString = price => price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' VNĐ'
 
 export const searchProduct = (keyword, items) => R.pipe(

@@ -8,17 +8,9 @@ import { isAdmin } from 'components/wrappers/isAdmin'
 import { updateActiveLink } from 'ducks/admin'
 import { fetchFoodCategories } from 'lib/actions/foodCategory'
 import { fetchFoods } from 'lib/actions/food'
-import { updateSelectedFood } from 'ducks/selectedFood'
 import { priceToString } from 'lib/objects'
 
 class Foods extends ReactQueryParams {
-  constructor (props) {
-    super(props)
-
-    this.increaseFood = this.increaseFood.bind(this)
-    this.decreaseFood = this.decreaseFood.bind(this)
-  }
-
   componentDidMount() {
     this.props.dispatch(fetchFoods())
     this.props.dispatch(fetchFoodCategories())
@@ -26,7 +18,7 @@ class Foods extends ReactQueryParams {
   }
 
   render() {
-    const { categories, foods, selectedFood, dispatch } = this.props
+    const { categories, foods } = this.props
     let params = this.queryParams
     if (!params.index) {
       params.index = 0
@@ -57,11 +49,6 @@ class Foods extends ReactQueryParams {
                           <div className='item-entry'>
                             <p style={style.description}> {priceToString(item.currentPrice)}</p>
                           </div>
-                          <div className='text-center number-order'>
-                            <Link className='fa fa-2x fa-minus-circle' style={style.selectButton} onClick={e => { e.preventDefault(); this.decreaseFood(item.id, dispatch) }}/>
-                            <span style={style.quantity}>{selectedFood && selectedFood[item.id.toString()] ? selectedFood[item.id.toString()].quantity : 0 }</span>
-                            <Link className='fa fa-2x fa-plus-circle' style={style.selectButton} onClick={e => { e.preventDefault(); this.increaseFood(item.id, dispatch) }}/>
-                          </div>
                         </article>
                       </div>
                     )
@@ -78,8 +65,7 @@ class Foods extends ReactQueryParams {
 
 const mapStateToProps = state => ({
   categories: state.foodCategory.items,
-  foods: state.food.items,
-  selectedFood: state.selectedFood.items
+  foods: state.food.items
 })
 
 export default R.pipe(

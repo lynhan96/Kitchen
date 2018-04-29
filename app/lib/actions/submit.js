@@ -1,17 +1,10 @@
 import { SubmissionError } from 'redux-form'
 import request from 'request-promise'
-import R from 'ramda'
-import * as firebase from 'firebase'
-import moment from 'moment'
 
-import { updateSelectedFood } from 'ducks/selectedFood'
 import { makeRequestOptions } from '../requestHeader'
 import { adminHasSignedIn } from 'ducks/admin'
 import { showNotification } from './showNotification'
 import Navigator from 'lib/Navigator'
-import { getSelectedState, getFoodState, getAdminData, getTableState, getOrderingState } from 'lib/Constant'
-import { fetchOrderings } from 'lib/actions/ordering'
-import { changeOrderModal } from 'ducks/modal'
 
 // Redux-form requires a promise for async submission
 // so we return a promise
@@ -81,93 +74,77 @@ export const submitForgotPassword =
     })
   }
 
-const getOrderItems = (selectItems, items) => R.pipe(
-  R.keys,
-  R.map(item => mergeQuantity(selectItems[item], items)),
-)(selectItems)
+// export const submitOrder =
+//   (values, dispatch, props) => {
+//     const foods = getFoodState().items
+//     const selectedFoods = getSelectedState().items
+//     const employeeData = getAdminData()
+//     const tableData = getTableState().items
+//     const orderingData = getOrderingState().items
+//     let items = getOrderItems(selectedFoods, foods)
+//     let table = tableData[values.tableId]
+//     let orderId = ''
+//     let message = ''
 
-const mergeQuantity = (selectItem, items) => {
-  const item = R.find(
-    R.propEq('id', parseInt(selectItem.id))
-  )(items)
+//     if (items.length === 0) {
+//       return showNotification('topCenter', 'info', 'Vui lòng chọn món ăn!')
+//     }
 
-  if (!item) return {}
-  item['quantity'] = selectItem.quantity
-  item['status'] = 'Đang chờ xác nhận từ nhà bếp'
-  return item
-}
+//     if (values.type === 'newOrder') {
+//       if (tableData[values.tableId].status === 'Đã có khách' || tableData[values.tableId].status === 'Đã đặt') {
+//         return showNotification('topCenter', 'error', 'Bàn đã có khách vui lòng chọn bàn khác!')
+//       }
 
-export const submitOrder =
-  (values, dispatch, props) => {
-    const foods = getFoodState().items
-    const selectedFoods = getSelectedState().items
-    const employeeData = getAdminData()
-    const tableData = getTableState().items
-    const orderingData = getOrderingState().items
-    let items = getOrderItems(selectedFoods, foods)
-    let table = tableData[values.tableId]
-    let orderId = ''
-    let message = ''
+//       orderId = firebase.database().ref(employeeData.vid + '/orders/').push().key
+//       message = 'Đặt món thành công!'
+//     } else {
+//       if (tableData[values.tableId].status !== 'Đã có khách' && tableData[values.tableId].status !== 'Đã đặt') {
+//         return showNotification('topCenter', 'error', 'Vui lòng chọn bàn đã có khách để thêm món ăn vào bàn đó!')
+//       }
 
-    if (items.length === 0) {
-      return showNotification('topCenter', 'info', 'Vui lòng chọn món ăn!')
-    }
+//       orderId = table.lastOrderingId
+//       const currentOrder = orderingData[orderId]
+//       if (currentOrder.items) {
+//         items = R.concat(currentOrder.items, items)
+//       }
 
-    if (values.type === 'newOrder') {
-      if (tableData[values.tableId].status === 'Đã có khách' || tableData[values.tableId].status === 'Đã đặt') {
-        return showNotification('topCenter', 'error', 'Bàn đã có khách vui lòng chọn bàn khác!')
-      }
+//       message = 'Thêm món ăn thành công!'
+//     }
 
-      orderId = firebase.database().ref(employeeData.vid + '/orders/').push().key
-      message = 'Đặt món thành công!'
-    } else {
-      if (tableData[values.tableId].status !== 'Đã có khách' && tableData[values.tableId].status !== 'Đã đặt') {
-        return showNotification('topCenter', 'error', 'Vui lòng chọn bàn đã có khách để thêm món ăn vào bàn đó!')
-      }
+//     const totalPrice = R.pipe(
+//       R.values,
+//       R.map(item => item.currentPrice * item.quantity),
+//       R.sum
+//     )(items)
 
-      orderId = table.lastOrderingId
-      const currentOrder = orderingData[orderId]
-      if (currentOrder.items) {
-        items = R.concat(currentOrder.items, items)
-      }
+//     const order = {
+//       createdAt: moment.utc().format('YYYY-MM-DD hh-mm-ss'),
+//       updatedAt: moment.utc().format('YYYY-MM-DD hh-mm-ss'),
+//       transactionId: 'BILL.' + moment.utc().format('YYYY.MM.DD.hh.mm.ss'),
+//       status: 'Đang gọi món',
+//       totalPrice: totalPrice,
+//       items: items,
+//       userName: '',
+//       userId: '',
+//       tableId: values.tableId,
+//       employeeName: employeeData.name,
+//       employeeToken: employeeData.token,
+//       id: orderId
+//     }
 
-      message = 'Thêm món ăn thành công!'
-    }
+//     firebase.database().ref(employeeData.vid + '/orders/').child(orderId).set(order)
 
-    const totalPrice = R.pipe(
-      R.values,
-      R.map(item => item.currentPrice * item.quantity),
-      R.sum
-    )(items)
+//     table.status = 'Đã có khách'
+//     table['lastOrderingId'] = orderId
 
-    const order = {
-      createdAt: moment.utc().format('YYYY-MM-DD hh-mm-ss'),
-      updatedAt: moment.utc().format('YYYY-MM-DD hh-mm-ss'),
-      transactionId: 'BILL.' + moment.utc().format('YYYY.MM.DD.hh.mm.ss'),
-      status: 'Đang gọi món',
-      totalPrice: totalPrice,
-      items: items,
-      userName: '',
-      userId: '',
-      tableId: values.tableId,
-      employeeName: employeeData.name,
-      employeeToken: employeeData.token,
-      id: orderId
-    }
+//     const ref = firebase.database().ref(employeeData.vid + '/tables').child(values.tableId)
+//     ref.set(table)
 
-    firebase.database().ref(employeeData.vid + '/orders/').child(orderId).set(order)
+//     dispatch(updateSelectedFood({}))
+//     dispatch(fetchOrderings())
+//     dispatch(changeOrderModal(false))
 
-    table.status = 'Đã có khách'
-    table['lastOrderingId'] = orderId
+//     showNotification('topCenter', 'success', message)
 
-    const ref = firebase.database().ref(employeeData.vid + '/tables').child(values.tableId)
-    ref.set(table)
-
-    dispatch(updateSelectedFood({}))
-    dispatch(fetchOrderings())
-    dispatch(changeOrderModal(false))
-
-    showNotification('topCenter', 'success', message)
-
-    Navigator.push('tabe-order-detail?tableId=' + values.tableId)
-  }
+//     Navigator.push('tabe-order-detail?tableId=' + values.tableId)
+//   }
