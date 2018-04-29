@@ -7,10 +7,20 @@ import { isAdmin } from 'components/wrappers/isAdmin'
 
 import { updateActiveLink } from 'ducks/admin'
 import { fetchFoodCategories } from 'lib/actions/foodCategory'
-import { fetchFoods } from 'lib/actions/food'
+import { fetchFoods, changeFoodStatus } from 'lib/actions/food'
 import { priceToString } from 'lib/objects'
 
 class Foods extends ReactQueryParams {
+  constructor (props) {
+    super(props)
+
+    this.foodStatus = this.foodStatus.bind(this)
+  }
+
+  foodStatus(foodId, newStatus) {
+    this.props.dispatch(changeFoodStatus(foodId, newStatus))
+  }
+
   componentDidMount() {
     this.props.dispatch(fetchFoods())
     this.props.dispatch(fetchFoodCategories())
@@ -47,7 +57,24 @@ class Foods extends ReactQueryParams {
                           </div>
                           <h4 className='item-title' style={style.name}>{item.name}</h4>
                           <div className='item-entry'>
+                            <p style={style.description}> {'Trạng thái: ' + item.status}</p>
+                          </div>
+                          <div className='item-entry'>
                             <p style={style.description}> {priceToString(item.currentPrice)}</p>
+                          </div>
+                          <div className='item-entry' style={style.actionButton}>
+                            <Link
+                              className='button-delete-food'
+                              to='#'
+                              style={style.deleteFood}
+                              onClick={e => { e.preventDefault(); this.foodStatus(item.id, 'Hết món') }}
+                            >Hết món</Link>
+                            <Link
+                              className='button-confirm-food'
+                              to='#'
+                              style={style.deleteFood}
+                              onClick={e => { e.preventDefault(); this.foodStatus(item.id, 'Còn món') }}
+                            >Còn món</Link>
                           </div>
                         </article>
                       </div>
@@ -89,7 +116,19 @@ const style = {
     textAlign: 'center',
     fontSize: '20px'
   },
-  selectButton: {
-    cursor: 'pointer'
+  actionButton: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center'
+  },
+  deleteFood: {
+    float: 'left',
+    textAlign: 'center',
+    fontSize: '17px',
+    color: 'white',
+    padding: '8px 15px',
+    borderRadius: '5px',
+    margin: '8px 5px',
+    fontWeight: 'bold'
   }
 }
