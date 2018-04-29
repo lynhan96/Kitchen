@@ -26,7 +26,7 @@ class Header extends Component {
 
     if (signedIn) {
       return (
-        <nav className='navbar navbar-transparent navbar-absolute fixed'>
+        <div className=''>
           <div className='container-fluid'>
             <div className='navbar-header'>
               <button type='button' className='navbar-toggle' data-toggle='collapse'>
@@ -36,7 +36,7 @@ class Header extends Component {
               <span className='icon-bar'></span>
               </button>
             </div>
-            <div className='collapse navbar-collapse' style={{ background: 'white' }}>
+            <div className='' style={{ background: 'white' }}>
               <ul className='nav navbar-nav navbar-right'>
                 <li className='dropdown'>
                   <a href='#' className='dropdown-toggle' data-toggle='dropdown' aria-expanded="false">
@@ -66,7 +66,7 @@ class Header extends Component {
               </div>
             </div>
           </div>
-        </nav>
+        </div>
       )
     } else {
       return (<div/>)
