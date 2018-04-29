@@ -61,6 +61,9 @@ class Header extends Component {
                   </Link>
                 </li>
               </ul>
+              <div className="form-group" style={styles.search}>
+                <input type="text" className="form-control" placeholder="Tìm kiếm món ăn" onChange={this.search}/>
+              </div>
             </div>
           </div>
         </nav>
@@ -77,3 +80,10 @@ const mapStateToProps = (state) => ({
 })
 
 export default connect(mapStateToProps)(Header)
+
+const styles = {
+  search: {
+    width: '70%',
+    marginTop: '4px'
+  }
+}

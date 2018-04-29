@@ -44,6 +44,8 @@ export const changeFoodStatus = (foodId, status) => {
       } else {
         dispatch(fetchFoods())
       }
+
+      return null
     })
     .catch(err => dispatch(fetchFoodsError(err)))
   }
