@@ -4,11 +4,19 @@ import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import Navigator from 'lib/Navigator'
 import { dispatchLogout } from 'ducks/admin'
+import { markReadMessage } from 'lib/actions/notification'
 
 class Header extends Component {
   constructor (props) {
     super(props)
     this.search = this.search.bind(this)
+    this.readMessage = this.readMessage.bind(this)
+  }
+
+  readMessage(redirectUrl, messageId) {
+    this.props.dispatch(markReadMessage(messageId))
+
+    Navigator.push(redirectUrl)
   }
 
   search(event) {
@@ -19,9 +27,11 @@ class Header extends Component {
     const { signedIn, dispatch, notifications } = this.props
     const logout = dispatchLogout(dispatch)
     let notificationData = []
+    let readMessage = 0
 
     if (notifications != null) {
       notificationData = R.values(notifications)
+      readMessage = R.filter(item => item.read && item.read === 'no')(notificationData).length
     }
 
     if (signedIn) {
@@ -41,21 +51,26 @@ class Header extends Component {
                 <li className='dropdown'>
                   <a href='#' className='dropdown-toggle' data-toggle='dropdown' aria-expanded="false">
                     <i className='material-icons'>notifications</i>
-                    <span className='notification'>{notificationData.length}</span>
-                    <p className='hidden-lg hidden-md'>Notifications</p>
+                    { readMessage > 0 ? <span className='notification'>{readMessage}</span> : ''}
                   </a>
                   <ul className='dropdown-menu'>
                     {notificationData.map((value, index) => {
+                      let url = ''
+
+                      if (value.tableId) {
+                        url = '/tabe-order-detail?tableId=' + value.tableId
+                      }
+
                       return (
                         <li key={index}>
-                          <a href='#'>{value.message}</a>
+                          <Link to='' onClick={e => { e.preventDefault(); this.readMessage(url, value.id) }}>{value.message}</Link>
                         </li>
                       )
                     })}
                   </ul>
                 </li>
                 <li>
-                  <Link to='dashboard' onClick={e => { e.preventDefault(); logout() }}>
+                  <Link to='login' onClick={e => { e.preventDefault(); logout() }}>
                     <i className='material-icons'>subdirectory_arrow_right</i>
                     <p className='hidden-lg hidden-md'>Thoát</p>
                   </Link>
@@ -76,7 +91,7 @@ class Header extends Component {
 
 const mapStateToProps = (state) => ({
   signedIn: state.admin.signedIn,
-  notifications: state.notification.data
+  notifications: state.notification.items
 })
 
 export default connect(mapStateToProps)(Header)

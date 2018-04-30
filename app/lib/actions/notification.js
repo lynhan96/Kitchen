@@ -1,14 +1,12 @@
-import { database } from 'database/database'
-import R from 'ramda'
-import { getAdminData } from 'lib/Constant'
 import * as firebase from 'firebase'
+import { getAdminData, getNotificationState } from 'lib/Constant'
 
 export const FETCH_NOTIFICATION_SUCCESS = 'FETCH_NOTIFICATION_SUCCESS'
 export const NOTIFICATION_CHANGED = 'NOTIFICATION_CHANGED'
 
-export const fetchNotificationSuccess = data => ({
+export const fetchNotificationSuccess = items => ({
   type: FETCH_NOTIFICATION_SUCCESS,
-  data
+  items
 })
 
 export const fetchNotifications = () => (dispatch) => {
@@ -17,4 +15,12 @@ export const fetchNotifications = () => (dispatch) => {
   ref.orderByChild('type').equalTo('kitchen').on('value', (result) => {
     dispatch(fetchNotificationSuccess(result.val()))
   })
+}
+
+export const markReadMessage = (messageId) => (dispatch) => {
+  const notifications = getNotificationState().items
+  let currentNotification = notifications[messageId]
+  currentNotification.read = 'yes'
+
+  firebase.database().ref(getAdminData().vid + '/notifications/').child(messageId).set(currentNotification)
 }

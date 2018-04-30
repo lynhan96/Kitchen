@@ -7,6 +7,7 @@ import { isAdmin } from 'components/wrappers/isAdmin'
 
 import { priceToString } from 'lib/objects'
 import { fetchOrderings, changeOrderFoodStatus } from 'lib/actions/ordering'
+import { fetchNotifications } from 'lib/actions/notification'
 
 class TableOrderDetail extends ReactQueryParams {
   constructor (props) {
@@ -20,6 +21,7 @@ class TableOrderDetail extends ReactQueryParams {
   }
 
   componentDidMount() {
+    this.props.dispatch(fetchNotifications())
     this.props.dispatch(fetchOrderings())
   }
 

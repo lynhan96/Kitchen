@@ -10,9 +10,11 @@ import ContentLoading from 'components/ContentLoading'
 import MapElement from 'components/admin/maps/MapElement'
 import { fetchTables } from 'lib/actions/table'
 import { fetchZones } from 'lib/actions/zone'
+import { fetchNotifications } from 'lib/actions/notification'
 
 class MapTable extends Component {
   componentDidMount() {
+    this.props.dispatch(fetchNotifications())
     this.props.dispatch(fetchTables())
     this.props.dispatch(fetchZones())
     this.props.dispatch(updateActiveLink('map-tables'))

@@ -5,7 +5,7 @@ import {
 import { ADMIN_SIGNED_OUT } from 'ducks/admin'
 
 const initialState = {
-  data: {},
+  items: {},
   loading: false,
   error: null
 }
@@ -15,7 +15,7 @@ const reducer = (state = initialState, action) => {
     case FETCH_NOTIFICATION_SUCCESS:
       return {
         ...state,
-        data: action.data,
+        items: action.items,
         loading: true,
         error: null
       }
@@ -25,8 +25,8 @@ const reducer = (state = initialState, action) => {
 
       return {
         ...state,
-        data: {
-          ...state.data,
+        items: {
+          ...state.items,
           [id]: action.item
         }
       }
