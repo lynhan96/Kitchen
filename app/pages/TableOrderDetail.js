@@ -162,7 +162,8 @@ const style = {
   },
   actionButton: {
     display: 'flex',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    justifyContent: 'center'
   },
   deleteFood: {
     float: 'left',
