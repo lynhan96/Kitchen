@@ -1,9 +1,8 @@
 import { database } from 'database/database'
 import R from 'ramda'
-import { getAdminData, getOrderingState } from 'lib/Constant'
+import { getAdminData, getOrderingState, getTableState } from 'lib/Constant'
 import * as firebase from 'firebase'
-import { confirmAlert } from 'react-confirm-alert'
-import 'react-confirm-alert/src/react-confirm-alert.css'
+import { markReadMessage } from 'lib/actions/notification'
 
 export const FETCH_ORDERING_BEGIN = 'FETCH_ORDERING_BEGIN'
 export const FETCH_ORDERING_SUCCESS = 'FETCH_ORDERING_SUCCESS'
@@ -72,9 +71,15 @@ export const removeFood = (notificationId, orderingId, itemIndex, confirmDeleted
   return dispatch => {
     const employeeData = getAdminData()
     const orderingData = getOrderingState().items
+    const tableData = getTableState().items
     let currentOrder = orderingData[orderingId]
+    const foodName = currentOrder.items[itemIndex].name
 
-    currentOrder.items = R.remove(itemIndex, 1)(currentOrder.items)
+    if (confirmDeleted) {
+      currentOrder.items = R.remove(itemIndex, 1)(currentOrder.items)
+    } else {
+      currentOrder.items[itemIndex]['note'] = 'Thức ăn đang được chế biến không thể hủy!'
+    }
 
     const totalPrice = R.pipe(
       R.values,
@@ -92,23 +97,22 @@ export const removeFood = (notificationId, orderingId, itemIndex, confirmDeleted
 
     firebase.database().ref(employeeData.vid + '/orders/').child(orderingId).set(currentOrder)
 
+    dispatch(markReadMessage(notificationId))
     dispatch(fetchOrderings())
-  }
-}
 
-export const showConfirmAlertDeleteItem = (dispatch, notificationId, orderingId, foodIndex) => () => {
-  confirmAlert({
-    title: '',
-    message: 'Bạn có đồng ý hủy món ăn này?',
-    buttons: [
-      {
-        label: 'Có',
-        onClick: () => dispatch(removeFood(notificationId, orderingId, foodIndex, true))
-      },
-      {
-        label: 'Không',
-        onClick: () => {}
-      }
-    ]
-  })
+    if (confirmDeleted) {
+      const currentTable = tableData[currentOrder.tableId]
+      const notificationId = firebase.database().ref(getAdminData().vid + '/notifications/').push().key
+
+      firebase.database().ref(getAdminData().vid + '/notifications/').child(notificationId).set({
+        id: notificationId,
+        message: currentTable.name + ': món ăn ' + foodName + ' đã được hủy',
+        type: 'waiter',
+        orderingId: orderingId,
+        tableId: currentOrder.tableId,
+        requiredDeleteFood: 'no',
+        read: 'no'
+      })
+    }
+  }
 }
