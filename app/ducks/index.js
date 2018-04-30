@@ -6,6 +6,7 @@ import food from 'ducks/food'
 import zone from 'ducks/zone'
 import table from 'ducks/table'
 import ordering from 'ducks/ordering'
+import webBrowserNotification from 'ducks/webBrowserNotification'
 
 export default {
   hydration,
@@ -15,5 +16,6 @@ export default {
   zone,
   table,
   ordering,
+  webBrowserNotification,
   notification
 }

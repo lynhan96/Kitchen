@@ -100,19 +100,23 @@ export const removeFood = (notificationId, orderingId, itemIndex, confirmDeleted
     dispatch(markReadMessage(notificationId))
     dispatch(fetchOrderings())
 
-    if (confirmDeleted) {
-      const currentTable = tableData[currentOrder.tableId]
-      const notificationId = firebase.database().ref(getAdminData().vid + '/notifications/').push().key
+    const currentTable = tableData[currentOrder.tableId]
+    const messageId = firebase.database().ref(getAdminData().vid + '/notifications/').push().key
 
-      firebase.database().ref(getAdminData().vid + '/notifications/').child(notificationId).set({
-        id: notificationId,
-        message: currentTable.name + ': món ăn ' + foodName + ' đã được hủy',
-        type: 'waiter',
-        orderingId: orderingId,
-        tableId: currentOrder.tableId,
-        requiredDeleteFood: 'no',
-        read: 'no'
-      })
+    let message = currentTable.name + ': món ăn ' + foodName + ' đã được hủy'
+
+    if (!confirmDeleted) {
+      message = currentTable.name + ': món ăn ' + foodName + ' không được hủy'
     }
+
+    firebase.database().ref(getAdminData().vid + '/notifications/').child(messageId).set({
+      id: messageId,
+      message: message,
+      type: 'waiter',
+      orderingId: orderingId,
+      tableId: currentOrder.tableId,
+      requiredDeleteFood: 'no',
+      read: 'no'
+    })
   }
 }

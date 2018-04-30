@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
 import SideBar from 'components/layout/SideBar'
 import Header from 'components/layout/Header'
@@ -10,6 +11,7 @@ import '../public/lib/cms/css/custom.css'
 import 'styles/website.less'
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import WebBrowserNotification from 'components/WebBrowserNotification'
 
 const ZoomInAndOut = ({ children, position, ...props }) => (
   <Transition
@@ -26,7 +28,7 @@ const ZoomInAndOut = ({ children, position, ...props }) => (
 )
 
 const App = (props) => {
-  const { children } = props
+  const { children, signedIn } = props
 
   return (
      <MuiThemeProvider>
@@ -35,6 +37,7 @@ const App = (props) => {
         <div className='main-panel'>
           <Header />
           {children}
+          {signedIn ? <WebBrowserNotification /> : <div/>}
           <ToastContainer transition={ZoomInAndOut}/>
         </div>
       </div>
@@ -42,4 +45,6 @@ const App = (props) => {
   )
 }
 
-export default App
+const mapStateToProps = (state) => state.admin
+
+export default connect(mapStateToProps)(App)
