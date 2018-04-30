@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import Navigator from 'lib/Navigator'
 import { dispatchLogout } from 'ducks/admin'
 import { markReadMessage } from 'lib/actions/notification'
+import { showConfirmAlertDeleteItem } from 'lib/actions/ordering'
 
 class Header extends Component {
   constructor (props) {
@@ -55,6 +56,16 @@ class Header extends Component {
                   </a>
                   <ul className='dropdown-menu'>
                     {notificationData.map((value, index) => {
+                      if (!value.read || value.read === 'yes') return ''
+
+                      if (value.requiredDeleteFood && value.requiredDeleteFood === 'yes') {
+                        return (
+                          <li key={index}>
+                            <Link to='#' onClick={e => { e.preventDefault(); showConfirmAlertDeleteItem(dispatch, value.id, value.orderingId, value.foodIndex) }}>{value.message}</Link>
+                          </li>
+                        )
+                      }
+
                       let url = ''
 
                       if (value.tableId) {
@@ -63,7 +74,7 @@ class Header extends Component {
 
                       return (
                         <li key={index}>
-                          <Link to='' onClick={e => { e.preventDefault(); this.readMessage(url, value.id) }}>{value.message}</Link>
+                          <Link to='#' onClick={e => { e.preventDefault(); this.readMessage(url, value.id) }}>{value.message}</Link>
                         </li>
                       )
                     })}
