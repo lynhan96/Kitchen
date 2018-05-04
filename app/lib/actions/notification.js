@@ -32,7 +32,9 @@ export const fetchNotifications = () => (dispatch) => {
         sound: 'sound/sound.mp3'
       }
 
-      const items = R.merge(getNotificationState().items)(result.val())
+      let items = getNotificationState().items
+      items[result.val().id] = result.val()
+
       dispatch(fetchNotificationSuccess(items))
 
       dispatch(viewWebBrowserNotification(title, options))
