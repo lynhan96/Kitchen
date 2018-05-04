@@ -8,7 +8,6 @@ import { isAdmin } from 'components/wrappers/isAdmin'
 import { updateActiveLink } from 'ducks/admin'
 import { fetchFoodCategories } from 'lib/actions/foodCategory'
 import { fetchFoods, changeFoodStatus } from 'lib/actions/food'
-import { fetchNotifications } from 'lib/actions/notification'
 import { priceToString } from 'lib/objects'
 
 class Foods extends ReactQueryParams {
@@ -23,7 +22,6 @@ class Foods extends ReactQueryParams {
   }
 
   componentDidMount() {
-    this.props.dispatch(fetchNotifications())
     this.props.dispatch(fetchFoods())
     this.props.dispatch(fetchFoodCategories())
     this.props.dispatch(updateActiveLink('foods'))
