@@ -3,19 +3,35 @@ import R from 'ramda'
 import ReactQueryParams from 'react-query-params'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
+import ReactPaginate from 'react-paginate'
 
 import { isAdmin } from 'components/wrappers/isAdmin'
 import { updateActiveLink } from 'ducks/admin'
-import { preapreFoodOrderHistory, updateSortValue, updateKeyWord } from 'lib/actions/foodOrderHistory'
-import ReactPaginate from 'react-paginate'
+import { preapreFoodOrderHistory, updateSortValue, updateKeyWord, updateFilterTable, updateFilterStatus } from 'lib/actions/foodOrderHistory'
 import { priceToString } from 'lib/objects'
+import { changeOrderFoodStatus } from 'lib/actions/ordering'
 
-class FoodList extends ReactQueryParams {
+class FoodManagement extends ReactQueryParams {
   constructor (props) {
     super(props)
 
     this.sortBy = this.sortBy.bind(this)
     this.search = this.search.bind(this)
+    this.changeStatus = this.changeStatus.bind(this)
+    this.filterByTable = this.filterByTable.bind(this)
+    this.filterByStatus = this.filterByStatus.bind(this)
+  }
+
+  filterByTable(event) {
+    this.props.dispatch(updateFilterTable(event.target.value))
+  }
+
+  filterByStatus(event) {
+    this.props.dispatch(updateFilterStatus(event.target.value))
+  }
+
+  changeStatus(orderingID, foodIndex, newStatus) {
+    this.props.dispatch(changeOrderFoodStatus(orderingID, foodIndex, newStatus))
   }
 
   sortBy(fieldName, sortType) {
@@ -36,8 +52,8 @@ class FoodList extends ReactQueryParams {
   }
 
   render() {
-    const { orderingState, foodOrderHistoryState } = this.props
-    const { sortType, sortBy, keyWord } = foodOrderHistoryState
+    const { orderings, foodOrderHistoryState, tables } = this.props
+    const { sortType, sortBy, keyWord, filterTable, filterStatus } = foodOrderHistoryState
 
     let iconName = 'fa fa-arrow-down '
 
@@ -45,17 +61,19 @@ class FoodList extends ReactQueryParams {
       iconName = 'fa fa-arrow-up '
     }
 
-    const datas = preapreFoodOrderHistory(orderingState.items, this.props.dispatch, foodOrderHistoryState)
+    const action = this
+
+    const datas = preapreFoodOrderHistory(orderings, this.props.dispatch, foodOrderHistoryState)
 
     const tableHeader = [
-      { 'fieldName': 'id', 'viewTitle': 'ID' },
+      { 'fieldName': 'time', 'viewTitle': 'Thời gian' },
+      { 'fieldName': 'tableName', 'viewTitle': 'Bàn ăn' },
       { 'fieldName': 'imageUrl', 'viewTitle': 'Hình ảnh' },
       { 'fieldName': 'name', 'viewTitle': 'Tên món ăn' },
-      { 'fieldName': 'price', 'viewTitle': 'Gía' },
-      { 'fieldName': 'sold', 'viewTitle': 'Đã hoàn thành' },
-      { 'fieldName': 'pending', 'viewTitle': 'Đang chờ chế biến' },
-      { 'fieldName': 'cancel', 'viewTitle': 'Hủy món' },
-      { 'fieldName': 'total', 'viewTitle': 'Tổng số lượng' }
+      { 'fieldName': 'status', 'viewTitle': 'Trạng thái' },
+      { 'fieldName': 'price', 'viewTitle': 'Gía Tiền' },
+      { 'fieldName': 'quantity', 'viewTitle': 'Số lượng' },
+      { 'fieldName': 'totalPrice', 'viewTitle': 'Tổng tiền' }
     ]
 
     return (
@@ -68,11 +86,44 @@ class FoodList extends ReactQueryParams {
                   <h4 className='title'>Quản lí món ăn</h4>
                 </div>
                 <div className='card-content table-responsive'>
-                  <div>
+                  <div style={{margin: '30px 0'}}>
                     <div className='row'>
                       <div className='form-group col-md-4 col-xs-12' style={{ margin: '0' }}>
                         <input type='text' className='form-control' placeholder='Tìm kiếm' defaultValue={keyWord} onChange={e => this.search(e)}/>
                         <span className='material-input'></span>
+                      </div>
+                      <div className='form-group col-md-3 col-xs-12' style={{ marginTop: '0' }}>
+                        <label style={{width: '30%', textAlign: 'center'}}>Bàn ăn:</label>
+                        <select
+                          style={{width: '70%', display: 'inline-block'}}
+                          className='form-control'
+                          onChange={this.filterByTable}
+                          value={filterTable}
+                        >
+                          <option value={'Tất cả'}>Tất cả</option>
+                          {R.keys(tables).map((key, index) => {
+                            const item = tables[key]
+                            return (
+                              <option value={key} key={index}>{item.name}</option>
+                            )
+                          })}
+                        </select>
+                      </div>
+                      <div className='form-group col-md-3 col-xs-12' style={{ marginTop: '0' }}>
+                        <label style={{width: '30%', textAlign: 'center'}}>Trạng thái:</label>
+                        <select
+                          style={{width: '70%', display: 'inline-block'}}
+                          className='form-control'
+                          onChange={this.filterByStatus}
+                          value={filterStatus}
+                        >
+                          <option value={'Tất cả'}>Tất cả</option>
+                          {['Đang chờ chế biến', 'Chế biến xong', 'Hết món'].map((item, index) => {
+                            return (
+                              <option value={item} key={index}>{item}</option>
+                            )
+                          })}
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -89,6 +140,7 @@ class FoodList extends ReactQueryParams {
                             </th>
                           )
                         })}
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -96,12 +148,12 @@ class FoodList extends ReactQueryParams {
                         return (
                           <tr key={itemIndex}>
                             {tableHeader.map(function(headerItem, headerIndex) {
-                              if (headerItem.fieldName === 'price') {
+                              if (headerItem.fieldName === 'price' || headerItem.fieldName === 'totalPrice') {
                                 return <td key={headerIndex}>{priceToString(item[headerItem.fieldName])}</td>
                               }
 
                               if (headerItem.fieldName === 'imageUrl') {
-                                if (item[headerItem.fieldName] !== null) {
+                                if (item[headerItem.fieldName] !== null && item[headerItem.fieldName]) {
                                   const key = Object.keys(item[headerItem.fieldName])
 
                                   return (
@@ -116,6 +168,30 @@ class FoodList extends ReactQueryParams {
 
                               return <td key={headerIndex}>{item[headerItem.fieldName]}</td>
                             })}
+                            <td>
+                              <Link
+                                to= '#'
+                                onClick={e => { e.preventDefault(); action.changeStatus(item.orderId, item.foodIndex, 'Đang chờ chế biến') }}
+                                rel='tooltip'
+                                title='Xác nhận còn món'
+                                className='btn btn-primary btn-simple btn-xs'>
+                                <i className='material-icons'>cached</i>
+                              </Link>
+                              <Link
+                                onClick={e => { e.preventDefault(); action.changeStatus(item.orderId, item.foodIndex, 'Chế biến xong') }}
+                                type='button' rel='tooltip'
+                                title='Chế biến xong'
+                                className='btn btn-primary btn-simple btn-xs'>
+                                <i className='material-icons'>done_all</i>
+                              </Link>
+                              <Link
+                                onClick={e => { e.preventDefault(); action.changeStatus(item.orderId, item.foodIndex, 'Hết món') }}
+                                type='button' rel='tooltip'
+                                title='Hủy món'
+                                className='btn btn-primary btn-simple btn-xs'>
+                                <i className='material-icons'>delete</i>
+                              </Link>
+                            </td>
                           </tr>
                         )
                       })}
@@ -146,15 +222,15 @@ class FoodList extends ReactQueryParams {
 }
 
 const mapStateToProps = state => ({
-  orderingState: state.ordering,
-  foodOrderHistoryState: state.foodOrderHistory,
-
+  orderings: state.ordering.items,
+  tables: state.table.items,
+  foodOrderHistoryState: state.foodOrderHistory
 })
 
 export default R.pipe(
   connect(mapStateToProps),
   isAdmin
-)(FoodList)
+)(FoodManagement)
 
 const style = {
   iconStyle: {
@@ -165,5 +241,15 @@ const style = {
   imageItem: {
     width: '80px',
     objectFit: 'contain'
+  },
+  deleteFood: {
+    float: 'left',
+    textAlign: 'center',
+    fontSize: '17px',
+    color: 'white',
+    padding: '8px 15px',
+    borderRadius: '5px',
+    margin: '8px 5px',
+    fontWeight: 'bold'
   }
 }
