@@ -1,5 +1,5 @@
 import R from 'ramda'
-import { sortObjectsByKeyAtoZ, sortObjectsByKeyZtoA } from 'lib/objects'
+import { sortObjectsByKeyAtoZ, sortObjectsByKeyZtoA, checkKeyword } from 'lib/objects'
 
 export const FETCH_FOOD_SORT_VALUE = 'FETCH_FOOD_SORT_VALUE'
 export const FETCH_FOOD_SEARCH_VALUE = 'FETCH_FOOD_SEARCH_VALUE'
@@ -23,7 +23,7 @@ export const updateKeyWord = keyWord => ({
 
 export const preapreFoodOrderHistory = (orderData, dispatch, foodOrderHistoryState) => {
   const datas = R.values(orderData)
-  const { sortType, sortBy } = foodOrderHistoryState
+  const { sortType, sortBy, keyWord } = foodOrderHistoryState
   let returnData = {}
 
   datas.map((order, index) => {
@@ -57,9 +57,17 @@ export const preapreFoodOrderHistory = (orderData, dispatch, foodOrderHistorySta
     })
   })
 
+  let data = []
+
   if (sortType === 'AtoZ') {
-    return sortObjectsByKeyAtoZ(returnData, sortBy, 0, 50)
+    data = sortObjectsByKeyAtoZ(returnData, sortBy, 0, 50)
   } else {
-    return sortObjectsByKeyZtoA(returnData, sortBy, 0, 50)
+    data = sortObjectsByKeyZtoA(returnData, sortBy, 0, 50)
   }
+
+  if (keyWord !== '') {
+    data = R.filter(item => checkKeyword(keyWord, item))(data)
+  }
+
+  return data
 }

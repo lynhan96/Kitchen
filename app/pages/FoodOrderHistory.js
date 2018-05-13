@@ -6,7 +6,7 @@ import { Link } from 'react-router'
 
 import { isAdmin } from 'components/wrappers/isAdmin'
 import { updateActiveLink } from 'ducks/admin'
-import { preapreFoodOrderHistory, updateSortValue } from 'lib/actions/foodOrderHistory'
+import { preapreFoodOrderHistory, updateSortValue, updateKeyWord } from 'lib/actions/foodOrderHistory'
 import ReactPaginate from 'react-paginate'
 import { priceToString } from 'lib/objects'
 
@@ -15,6 +15,7 @@ class FoodList extends ReactQueryParams {
     super(props)
 
     this.sortBy = this.sortBy.bind(this)
+    this.search = this.search.bind(this)
   }
 
   sortBy(fieldName, sortType) {
@@ -26,13 +27,17 @@ class FoodList extends ReactQueryParams {
     }
   }
 
+  search(e) {
+    this.props.dispatch(updateKeyWord(e.target.value))
+  }
+
   componentDidMount() {
     this.props.dispatch(updateActiveLink('food-order-history'))
   }
 
   render() {
     const { orderingState, foodOrderHistoryState } = this.props
-    const { sortType, sortBy } = foodOrderHistoryState
+    const { sortType, sortBy, keyWord } = foodOrderHistoryState
 
     let iconName = 'fa fa-arrow-down '
 
@@ -66,7 +71,7 @@ class FoodList extends ReactQueryParams {
                   <div>
                     <div className='row'>
                       <div className='form-group col-md-4 col-xs-12' style={{ margin: '0' }}>
-                        <input type='text' className='form-control' placeholder='Tìm kiếm'/>
+                        <input type='text' className='form-control' placeholder='Tìm kiếm' defaultValue={keyWord} onChange={e => this.search(e)}/>
                         <span className='material-input'></span>
                       </div>
                     </div>
