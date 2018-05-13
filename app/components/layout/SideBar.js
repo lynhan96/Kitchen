@@ -48,6 +48,12 @@ class SideBar extends Component {
                   <p>Sơ đồ nhà hàng</p>
                 </Link>
               </li>
+              <li className={activeLink === 'food-order-history' ? 'active' : ''}>
+                <Link to='food-order-history'>
+                  <i className='material-icons'>local_dining</i>
+                  <p>Quản lí món ăn</p>
+                </Link>
+              </li>
               <li className={activeLink === 'order-food' ? 'active' : ''}>
                 <Link to='#' onClick={e => { e.preventDefault(); this.reloadMenu() }}>
                   <i className="material-icons">list</i>

@@ -120,3 +120,41 @@ export const removeFood = (notificationId, orderingId, itemIndex, confirmDeleted
     })
   }
 }
+
+export const preapreFoodOrderHistory = orderData => {
+  const datas = R.values(orderData)
+  let returnData = {}
+
+  datas.map((order, index) => {
+    order.items.map((food, _) => {
+      if (!returnData[food.id]) {
+        returnData[food.id] = {
+          id: food.id,
+          imageUrl: food.imageUrl,
+          name: food.name,
+          price: food.currentPrice,
+          sold: 0,
+          pending: 0,
+          cancel: 0,
+          total: 0
+        }
+      }
+
+      if (food.status === 'Chế biến xong') {
+        returnData[food.id].sold += food.quantity
+      }
+
+      if (food.status === 'Đang chờ chế biến') {
+        returnData[food.id].pending += food.quantity
+      }
+
+      if (food.status === 'Hết món') {
+        returnData[food.id].cancel += food.quantity
+      }
+
+      returnData[food.id].total = returnData[food.id].sold + returnData[food.id].pending + returnData[food.id].cancel
+    })
+  })
+
+  return R.values(returnData)
+}

@@ -13,6 +13,7 @@ import MapTable from 'components/admin/maps/MapTable'
 
 import Foods from 'pages/Foods'
 import TableOrderDetail from 'pages/TableOrderDetail'
+import FoodOrderHistory from 'pages/FoodOrderHistory'
 import Search from 'pages/Search'
 
 ReactDOM.render((
@@ -25,6 +26,7 @@ ReactDOM.render((
         <Route path='foods' component={Foods} />
         <Route path='tabe-order-detail' component={TableOrderDetail} />
         <Route path='search' component={Search} />
+        <Route path='food-order-history' component={FoodOrderHistory} />
 
         <Route path='map-tables' component={MapTable} />
       </Route>

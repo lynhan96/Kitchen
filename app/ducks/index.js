@@ -7,6 +7,7 @@ import zone from 'ducks/zone'
 import table from 'ducks/table'
 import ordering from 'ducks/ordering'
 import webBrowserNotification from 'ducks/webBrowserNotification'
+import foodOrderHistory from 'ducks/foodOrderHistory'
 
 export default {
   hydration,
@@ -17,5 +18,6 @@ export default {
   table,
   ordering,
   webBrowserNotification,
-  notification
+  notification,
+  foodOrderHistory
 }
