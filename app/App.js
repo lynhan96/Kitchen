@@ -16,6 +16,7 @@ import WebBrowserNotification from 'components/WebBrowserNotification'
 import { fetchNotifications } from 'lib/actions/notification'
 import { fetchTables } from 'lib/actions/table'
 import { fetchZones } from 'lib/actions/zone'
+import { getAdminData } from 'lib/Constant'
 
 const ZoomInAndOut = ({ children, position, ...props }) => (
   <Transition
@@ -34,6 +35,10 @@ const ZoomInAndOut = ({ children, position, ...props }) => (
 class App extends Component {
   componentWillUpdate() {
     if (this.props.signedIn) {
+      if (getAdminData() == null) {
+        return
+      }
+
       this.props.dispatch(fetchNotifications())
       this.props.dispatch(fetchTables())
       this.props.dispatch(fetchZones())
