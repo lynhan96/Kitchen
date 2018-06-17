@@ -22,6 +22,10 @@ export const fetchZoneSuccess = items => ({
 })
 
 export const fetchZones = () => (dispatch) => {
+  if (getAdminData() == null) {
+    return
+  }
+
   const ref = database.ref(getAdminData().vid + '/zones')
   ref.once('value')
     .then((snapshot) => {
