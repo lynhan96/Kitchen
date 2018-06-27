@@ -87,26 +87,29 @@ class TableOrderDetail extends ReactQueryParams {
                         <div className='item-entry'>
                           <p style={style.description}> {priceToString(item.currentPrice) + ' x ' + item.quantity}</p>
                         </div>
-                        <div className='item-entry' style={style.actionButton}>
-                          <Link
-                            className='button-delete-food'
-                            to='#'
-                            style={style.deleteFood}
-                            onClick={e => { e.preventDefault(); this.changeFoodStatus(ordering.id, index, 'Hết món') }}
-                          >Hết món</Link>
-                          <Link
-                            className='button-confirm-food'
-                            to='#'
-                            style={style.deleteFood}
-                            onClick={e => { e.preventDefault(); this.changeFoodStatus(ordering.id, index, 'Đang chờ chế biến') }}
-                          >Xác nhận còn món</Link>
-                          <Link
-                            className='button-done-food'
-                            to='#'
-                            style={style.deleteFood}
-                            onClick={e => { e.preventDefault(); this.changeFoodStatus(ordering.id, index, 'Chế biến xong') }}
-                          >Chế biến xong</Link>
-                        </div>
+                        { item.status === 'Chế biến xong' ?
+                          <p style={style.message}>Món ăn đã được chế biến xong</p> :
+                          <div className='item-entry' style={style.actionButton}>
+                            <Link
+                              className='button-delete-food'
+                              to='#'
+                              style={style.deleteFood}
+                              onClick={e => { e.preventDefault(); this.changeFoodStatus(ordering.id, index, 'Hết món') }}
+                            >Hết món</Link>
+                            <Link
+                              className='button-confirm-food'
+                              to='#'
+                              style={style.deleteFood}
+                              onClick={e => { e.preventDefault(); this.changeFoodStatus(ordering.id, index, 'Đang chờ chế biến') }}
+                            >Xác nhận còn món</Link>
+                            <Link
+                              className='button-done-food'
+                              to='#'
+                              style={style.deleteFood}
+                              onClick={e => { e.preventDefault(); this.changeFoodStatus(ordering.id, index, 'Chế biến xong') }}
+                            >Chế biến xong</Link>
+                          </div>
+                        }
                       </article>
                     </div>
                   )
@@ -172,5 +175,12 @@ const style = {
     borderRadius: '5px',
     margin: '8px 5px',
     fontWeight: 'bold'
+  },
+  message: {
+    marginTop: '30px',
+    marginBottom: '33px',
+    fontSize: '17px',
+    fontWeight: 'bold',
+    textAlign: 'center'
   }
 }
