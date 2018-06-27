@@ -81,6 +81,9 @@ export const removeFood = (notificationId, orderingId, itemIndex, quantity, conf
 
     if (confirmDeleted) {
       currentOrder.items[itemIndex].quantity = currentOrder.items[itemIndex].quantity - quantity
+      if (currentOrder.items[itemIndex].quantity === 0) {
+        currentOrder.items = R.remove(itemIndex, 1)(currentOrder.items)
+      }
     } else {
       currentOrder.items[itemIndex]['note'] = 'Thức ăn đang được chế biến không thể hủy!'
     }
