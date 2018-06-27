@@ -17,18 +17,18 @@ class Header extends Component {
     this.showConfirmAlert = this.showConfirmAlert.bind(this)
   }
 
-  showConfirmAlert(notificationId, orderingId, foodIndex) {
+  showConfirmAlert(notificationId, orderingId, foodIndex, quantity) {
     confirmAlert({
       title: '',
       message: 'Bạn có đồng ý hủy món ăn này?',
       buttons: [
         {
           label: 'Có',
-          onClick: () => this.props.dispatch(removeFood(notificationId, orderingId, foodIndex, true))
+          onClick: () => this.props.dispatch(removeFood(notificationId, orderingId, foodIndex, quantity, true))
         },
         {
           label: 'Không',
-          onClick: () => this.props.dispatch(removeFood(notificationId, orderingId, foodIndex, false))
+          onClick: () => this.props.dispatch(removeFood(notificationId, orderingId, foodIndex, quantity, false))
         }
       ]
     })
@@ -81,7 +81,7 @@ class Header extends Component {
                       if (value.requiredDeleteFood && value.requiredDeleteFood === 'yes') {
                         return (
                           <li key={index}>
-                            <Link to='#' onClick={e => { e.preventDefault(); this.showConfirmAlert(value.id, value.orderingId, value.foodIndex) }}>{value.message}</Link>
+                            <Link to='#' onClick={e => { e.preventDefault(); this.showConfirmAlert(value.id, value.orderingId, value.foodIndex, value.quantity) }}>{value.message}</Link>
                           </li>
                         )
                       }

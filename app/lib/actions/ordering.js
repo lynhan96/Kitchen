@@ -47,6 +47,10 @@ export const changeOrderFoodStatus = (orderingId, itemIndex, newStatus) => {
 
     currentOrder.items[itemIndex].status = newStatus
 
+    if (newStatus === 'Chế biến xong') {
+      currentOrder.items[itemIndex]['note'] = 'Thức ăn đang được chế biến không thể hủy!'
+    }
+
     const totalPrice = R.pipe(
       R.values,
       R.map(item => {
@@ -67,7 +71,7 @@ export const changeOrderFoodStatus = (orderingId, itemIndex, newStatus) => {
   }
 }
 
-export const removeFood = (notificationId, orderingId, itemIndex, confirmDeleted) => {
+export const removeFood = (notificationId, orderingId, itemIndex, quantity, confirmDeleted) => {
   return dispatch => {
     const employeeData = getAdminData()
     const orderingData = getOrderingState().items
@@ -76,7 +80,7 @@ export const removeFood = (notificationId, orderingId, itemIndex, confirmDeleted
     const foodName = currentOrder.items[itemIndex].name
 
     if (confirmDeleted) {
-      currentOrder.items = R.remove(itemIndex, 1)(currentOrder.items)
+      currentOrder.items[itemIndex].quantity = currentOrder.items[itemIndex].quantity - quantity
     } else {
       currentOrder.items[itemIndex]['note'] = 'Thức ăn đang được chế biến không thể hủy!'
     }
